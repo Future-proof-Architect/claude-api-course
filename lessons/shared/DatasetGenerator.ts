@@ -1,5 +1,6 @@
 import pLimit from "p-limit";
-import { Message, add_user_message, chatStructured, render, writeOutput } from "./shared.js";
+import { add_user_message, chatStructured, render, writeOutput } from "./shared.js";
+import type { MessageParam } from "./shared-types.js";
 
 export class DatasetGenerator {
   private concurrency: number;
@@ -36,7 +37,7 @@ Remember: only generate {numCases} unique ideas.`,
       { numCases, taskDescription, promptInputsStr },
     );
 
-    const messages: Message[] = [];
+    const messages: MessageParam[] = [];
     add_user_message(messages, prompt);
     const result = await chatStructured(
       messages,
@@ -79,7 +80,7 @@ IMPORTANT: Only use the exact input keys listed in allowed_input_keys. Include 1
       { taskDescription, idea, allowedKeys, examplePromptInputs },
     );
 
-    const messages: Message[] = [];
+    const messages: MessageParam[] = [];
     add_user_message(messages, prompt);
     const inputProperties = Object.fromEntries(
       Object.keys(promptInputsSpec).map((k) => [k, { type: "string" as const }]),

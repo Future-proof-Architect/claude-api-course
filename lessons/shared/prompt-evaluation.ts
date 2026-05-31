@@ -1,12 +1,6 @@
-import {
-  add_user_message,
-  chatStructured,
-  chatText,
-  Message,
-  Task,
-  evalResultSchema,
-  EvalResult,
-} from "./shared.js";
+import type { MessageParam, Task, EvalResult } from "./shared-types.js";
+import { evalResultSchema } from "./shared-types.js";
+import { add_user_message, chatStructured } from "./shared.js";
 
 export async function grade_by_model(
   test_case: Task,
@@ -38,7 +32,7 @@ export async function grade_by_model(
     - "score": A number between 1-10
     `;
 
-  const messages: Message[] = [];
+  const messages: MessageParam[] = [];
   add_user_message(messages, eval_prompt);
   const result = await chatStructured(messages, { evals: evalResultSchema });
 
@@ -79,7 +73,7 @@ export async function run_prompt(test_case: Task): Promise<string> {
   const prompt = `Please solve the following task: ${test_case.task}
   Provide only the code as your answer, without any explanations.`;
 
-  const messages: Message[] = [];
+  const messages: MessageParam[] = [];
   add_user_message(messages, prompt);
   const response = await chatStructured(messages, {
     solution: { type: "string" },

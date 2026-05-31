@@ -1,12 +1,6 @@
-import {
-  Message,
-  add_user_message,
-  chatStructured,
-  render,
-  evalResultSchema,
-  EvalResult,
-  Task,
-} from "./shared.js";
+import type { MessageParam, Task, EvalResult } from "./shared-types.js";
+import { evalResultSchema } from "./shared-types.js";
+import { add_user_message, chatStructured, render } from "./shared.js";
 import { grade_by_model } from "./prompt-evaluation.js";
 import type { GenericTestCase } from "./DatasetGenerator.js";
 
@@ -117,9 +111,13 @@ IMPORTANT: Grade ONLY on the listed criteria. ANY violation of a mandatory requi
       },
     );
 
-    const messages: Message[] = [];
+    const messages: MessageParam[] = [];
     add_user_message(messages, evalPrompt);
-    const result = await chatStructured(messages, { evals: evalResultSchema }, 0.0);
+    const result = await chatStructured(
+      messages,
+      { evals: evalResultSchema },
+      0.0,
+    );
     return result?.evals as EvalResult;
   }
 }

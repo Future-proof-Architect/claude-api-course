@@ -1,12 +1,13 @@
 import * as readline from "readline";
 import { client, MODEL, MAX_TOKENS } from "./shared/settings.js";
-import { Message, add_user_message, add_assistant_message } from "./shared/shared.js";
+import type { MessageParam } from "./shared/shared-types.js";
+import { add_user_message, add_assistant_message } from "./shared/shared.js";
 
 function prompt(question: string): Promise<string> {
   return new Promise((resolve) => rl.question(question, resolve));
 }
 
-async function chat(messages: Message[], system: string | undefined = undefined, temperature = 0.0): Promise<string> {
+async function chat(messages: MessageParam[], system: string | undefined = undefined, temperature = 0.0): Promise<string> {
   const message = await client.messages.create({
     model: MODEL,
     max_tokens: MAX_TOKENS,
@@ -25,7 +26,7 @@ async function chat(messages: Message[], system: string | undefined = undefined,
   return answer;
 }
 
-let messages: Message[] = [];
+let messages: MessageParam[] = [];
 const system = undefined; // "Guide me to the right answer like you're a mama bear.";
 
 const rl = readline.createInterface({

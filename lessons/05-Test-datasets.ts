@@ -1,4 +1,6 @@
-import { Message, Task, taskSchema, add_user_message, chatStructured, writeOutput } from "./shared/shared.js";
+import type { MessageParam, Task } from "./shared/shared-types.js";
+import { taskSchema } from "./shared/shared-types.js";
+import { add_user_message, chatStructured, writeOutput } from "./shared/shared.js";
 
 const prompt = `Generate an evaluation dataset for a prompt evaluation. The dataset will be used to evaluate prompts that generate Python, JSON, or Regex specifically for AWS-related tasks.
 
@@ -8,7 +10,7 @@ const prompt = `Generate an evaluation dataset for a prompt evaluation. The data
 Please generate 3 objects.`;
 
 // Initial approach:
-let messages: Message[] = [];
+let messages: MessageParam[] = [];
 add_user_message(messages, prompt);
 
 const result = await chatStructured(messages, {

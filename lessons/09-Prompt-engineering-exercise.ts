@@ -10,7 +10,8 @@
 
 // Step 2: evaluate
 import { StrictModelGrader } from "./shared/graders";
-import { add_user_message, chatText, Message } from "./shared/shared";
+import type { MessageParam } from "./shared/shared-types.js";
+import { add_user_message, chatText } from "./shared/shared";
 import { runEval } from "./shared/prompt-engineering";
 
 async function run_prompt(inputs: Record<string, string>): Promise<string> {
@@ -38,7 +39,7 @@ async function run_prompt(inputs: Record<string, string>): Promise<string> {
     // Keep in mind that "Nothing but JSON" instruction from the official course 
     // has been removed as it may penalise evaluations for having markdown around JSON
 
-  const messages: Message[] = [];
+  const messages: MessageParam[] = [];
   add_user_message(messages, prompt);
   return chatText(messages);
 }

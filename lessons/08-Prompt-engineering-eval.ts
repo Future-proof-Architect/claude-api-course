@@ -1,5 +1,6 @@
 import { StrictModelGrader } from "./shared/graders";
-import { add_user_message, chatText, Message } from "./shared/shared";
+import type { MessageParam } from "./shared/shared-types.js";
+import { add_user_message, chatText } from "./shared/shared";
 import { runEval } from "./shared/prompt-engineering";
 
 async function run_prompt(inputs: Record<string, string>): Promise<string> {
@@ -35,7 +36,7 @@ ${guidelines}
 
 Avoid using markdown, provide the output in plain text instead.`;
 
-  const messages: Message[] = [];
+  const messages: MessageParam[] = [];
   add_user_message(messages, prompt);
   return chatText(messages);
 }

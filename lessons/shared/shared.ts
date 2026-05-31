@@ -2,67 +2,54 @@ import { writeFileSync, mkdirSync } from "fs";
 import { dirname } from "path";
 import { client, MODEL, MAX_TOKENS } from "./settings.js";
 import { jsonSchemaOutputFormat } from "@anthropic-ai/sdk/helpers/json-schema";
-import type { FromSchema, JSONSchema } from "json-schema-to-ts";
+import type { JSONSchema } from "json-schema-to-ts";
+import type { Message, MessageParam, Tool } from "./shared-types.js";
 
-export type Message = {
-  role: "user" | "assistant";
-  content: string;
-};
+type MessageInput = string | Message;
 
-export const taskSchema = {
-  type: "object",
-  properties: {
-    task: { type: "string" },
-    format: { type: "string", enum: ["python", "json", "regex"] },
-    solution_criteria: { type: "string" },
-  },
-  required: ["task", "format", "solution_criteria"],
-  additionalProperties: false,
-} as const;
-
-export type Task = FromSchema<typeof taskSchema>;
-
-// The grading shape used by all model-based evals across lessons 06+.
-// Course quiz answer: a good eval prompt asks for strengths/weaknesses/reasoning,
-// not just a bare score — so we lock this shape in shared and reuse it everywhere.
-export const evalResultSchema = {
-  type: "object",
-  properties: {
-    strengths: { type: "array", items: { type: "string" } },
-    weaknesses: { type: "array", items: { type: "string" } },
-    reasoning: { type: "string" },
-    score: { type: "number" },
-  },
-  required: ["strengths", "weaknesses", "reasoning", "score"],
-} as const;
-
-export type EvalResult = FromSchema<typeof evalResultSchema>;
-
-export function add_user_message(messages: Message[], text: string) {
-  messages.push({ role: "user", content: text });
+function toContent(input: MessageInput): MessageParam["content"] {
+  return typeof input === "string" ? input : input.content;
 }
 
-export function add_assistant_message(messages: Message[], text: string) {
-  messages.push({ role: "assistant", content: text });
+function text_from_message(message: Message): string {
+  return message.content
+    .filter((block) => block.type === "text")
+    .map((block) => block.text)
+    .join("\n");
 }
 
-export async function chatText(messages: Message[]): Promise<string> {
+export function add_user_message(messages: MessageParam[], input: MessageInput) {
+  messages.push({ role: "user", content: toContent(input) });
+}
+
+export function add_assistant_message(messages: MessageParam[], input: MessageInput) {
+  messages.push({ role: "assistant", content: toContent(input) });
+}
+
+export async function chat(messages: MessageParam[], tools?: Tool[]): Promise<Message> {
   const message = await client.messages.create({
     model: MODEL,
     max_tokens: MAX_TOKENS,
     messages,
+    tools,
   });
 
-  const block = message.content[0];
-  if (block.type !== "text") {
-    throw new Error("Expected text content");
-  }
+  return message;
+}
 
-  return block.text;
+export async function chatText(messages: MessageParam[], tools?: Tool[]): Promise<string> {
+  const message = await client.messages.create({
+    model: MODEL,
+    max_tokens: MAX_TOKENS,
+    messages,
+    tools,
+  });
+
+  return text_from_message(message);
 }
 
 export async function chatStructured(
-  messages: Message[],
+  messages: MessageParam[],
   properties: Record<string, JSONSchema>,
   temperature = 1.0
 ): Promise<Record<string, unknown> | undefined> {

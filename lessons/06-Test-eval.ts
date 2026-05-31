@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import { Task } from "./shared/shared.js";
+import { Task } from "./shared/shared-types.js";
 import { run_eval, run_prompt, grade_syntax } from "./shared/prompt-evaluation.js";
 import { PromptEvaluator } from "./shared/PromptEvaluator.js";
 import { ModelGrader, CompositeGrader } from "./shared/graders.js";

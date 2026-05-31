@@ -1,7 +1,8 @@
 import { client, MODEL, MAX_TOKENS } from "./shared/settings.js";
-import { Message, add_user_message } from "./shared/shared.js";
+import type { MessageParam } from "./shared/shared-types.js";
+import { add_user_message } from "./shared/shared.js";
 
-async function chat(messages: Message[]): Promise<string> {
+async function chat(messages: MessageParam[]): Promise<string> {
   const response = await client.messages.create({
     model: MODEL,
     max_tokens: MAX_TOKENS,
@@ -40,7 +41,7 @@ async function chat(messages: Message[]): Promise<string> {
 }
 
 // Start with an empty message list
-let messages: Message[] = [];
+let messages: MessageParam[] = [];
 
 // Add the initial user question
 add_user_message(

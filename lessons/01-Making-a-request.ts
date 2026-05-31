@@ -1,7 +1,8 @@
-import { Message, add_user_message, add_assistant_message, chatText } from "./shared/shared.js";
+import type { MessageParam } from "./shared/shared-types.js";
+import { add_user_message, add_assistant_message, chatText } from "./shared/shared.js";
 
 // Start with an empty message list
-let messages: Message[] = [];
+let messages: MessageParam[] = [];
 
 // Add the initial user question
 add_user_message(messages, "Define quantum computing in one sentence");

@@ -1,7 +1,8 @@
 import { client, MODEL, MAX_TOKENS } from "./shared/settings.js";
-import { Message, add_user_message } from "./shared/shared.js";
+import type { MessageParam } from "./shared/shared-types.js";
+import { add_user_message } from "./shared/shared.js";
 
-let messages: Message[] = [];
+let messages: MessageParam[] = [];
 add_user_message(messages, "Write a 1 sentence description of a fake database");
 
 /*
