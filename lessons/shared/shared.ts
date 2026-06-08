@@ -5,25 +5,19 @@ import { jsonSchemaOutputFormat } from "@anthropic-ai/sdk/helpers/json-schema";
 import type { JSONSchema } from "json-schema-to-ts";
 import type { Message, MessageParam, Tool } from "./shared-types.js";
 
-type MessageInput = string | Message;
-
-function toContent(input: MessageInput): MessageParam["content"] {
-  return typeof input === "string" ? input : input.content;
-}
-
-function text_from_message(message: Message): string {
+export function text_from_message(message: Message): string {
   return message.content
     .filter((block) => block.type === "text")
     .map((block) => block.text)
     .join("\n");
 }
 
-export function add_user_message(messages: MessageParam[], input: MessageInput) {
-  messages.push({ role: "user", content: toContent(input) });
+export function add_user_message(messages: MessageParam[], content: MessageParam["content"]) {
+  messages.push({ role: "user", content });
 }
 
-export function add_assistant_message(messages: MessageParam[], input: MessageInput) {
-  messages.push({ role: "assistant", content: toContent(input) });
+export function add_assistant_message(messages: MessageParam[], content: MessageParam["content"]) {
+  messages.push({ role: "assistant", content });
 }
 
 export async function chat(messages: MessageParam[], tools?: Tool[]): Promise<Message> {
@@ -38,13 +32,7 @@ export async function chat(messages: MessageParam[], tools?: Tool[]): Promise<Me
 }
 
 export async function chatText(messages: MessageParam[], tools?: Tool[]): Promise<string> {
-  const message = await client.messages.create({
-    model: MODEL,
-    max_tokens: MAX_TOKENS,
-    messages,
-    tools,
-  });
-
+  const message = await chat(messages, tools);
   return text_from_message(message);
 }
 
