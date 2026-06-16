@@ -47,7 +47,7 @@ export async function chatText(messages: MessageParam[], options: ChatOptions = 
 export async function chatStructured(
   messages: MessageParam[],
   properties: Record<string, JSONSchema>,
-  temperature = 1.0
+  temperature = 0.0
 ): Promise<Record<string, unknown> | undefined> {
   const response = await client.messages.parse({
     model: MODEL,

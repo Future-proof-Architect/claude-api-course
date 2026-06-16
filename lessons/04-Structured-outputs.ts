@@ -11,15 +11,19 @@ add_user_message(
 );
 
 // # Get Claude's response
-const result = await chatStructured(messages, {
-  commands: { 
-    type: "array", 
-    items: { type: "string" }, 
-    minItems: 3, 
-    maxItems: 3 
+const result = await chatStructured(
+  messages,
+  {
+    commands: {
+      type: "array",
+      items: { type: "string" },
+      minItems: 3,
+      maxItems: 3,
+    },
   },
-});
+  1.0,
+);
 
 // console.log(result);
-const answer = (result?.commands as string[] ?? []).join("\n");
+const answer = ((result?.commands as string[]) ?? []).join("\n");
 console.log(answer.trim());
