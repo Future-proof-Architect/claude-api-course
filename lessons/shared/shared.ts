@@ -20,19 +20,27 @@ export function add_assistant_message(messages: MessageParam[], content: Message
   messages.push({ role: "assistant", content });
 }
 
-export async function chat(messages: MessageParam[], tools?: Tool[]): Promise<Message> {
+export interface ChatOptions {
+  tools?: Tool[];
+  system?: string;
+  temperature?: number;
+}
+
+export async function chat(messages: MessageParam[], { tools, system, temperature }: ChatOptions = {}): Promise<Message> {
   const message = await client.messages.create({
     model: MODEL,
     max_tokens: MAX_TOKENS,
     messages,
     tools,
+    system,
+    temperature,
   });
 
   return message;
 }
 
-export async function chatText(messages: MessageParam[], tools?: Tool[]): Promise<string> {
-  const message = await chat(messages, tools);
+export async function chatText(messages: MessageParam[], options: ChatOptions = {}): Promise<string> {
+  const message = await chat(messages, options);
   return text_from_message(message);
 }
 
