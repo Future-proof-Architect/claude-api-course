@@ -3,7 +3,7 @@ import { dirname } from "path";
 import { client, MODEL, MAX_TOKENS } from "./settings.js";
 import { jsonSchemaOutputFormat } from "@anthropic-ai/sdk/helpers/json-schema";
 import type { JSONSchema } from "json-schema-to-ts";
-import type { Message, MessageParam, Tool } from "./shared-types.js";
+import type { ChatOptions, Message, MessageParam } from "./shared-types.js";
 
 export function text_from_message(message: Message): string {
   return message.content
@@ -18,12 +18,6 @@ export function add_user_message(messages: MessageParam[], content: MessageParam
 
 export function add_assistant_message(messages: MessageParam[], content: MessageParam["content"]) {
   messages.push({ role: "assistant", content });
-}
-
-export interface ChatOptions {
-  tools?: Tool[];
-  system?: string;
-  temperature?: number;
 }
 
 export async function chat(messages: MessageParam[], { tools, system, temperature }: ChatOptions = {}): Promise<Message> {

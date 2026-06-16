@@ -5,6 +5,12 @@ export type MessageParam = Anthropic.MessageParam;
 export type Message = Anthropic.Message;
 export type Tool = Anthropic.Tool;
 
+export interface ChatOptions {
+  tools?: Tool[];
+  system?: string;
+  temperature?: number;
+}
+
 export const taskSchema = {
   type: "object",
   properties: {
