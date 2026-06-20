@@ -1,31 +1,16 @@
 import Anthropic from "@anthropic-ai/sdk";
 type Tool = Anthropic.Tool;
 
-const DATE_STYLE_VALUES = ["full", "long", "medium", "short"] as const;
-const TIME_STYLE_VALUES = ["full", "long", "medium", "short"] as const;
-
-type DateStyle = (typeof DATE_STYLE_VALUES)[number];
-type TimeStyle = (typeof TIME_STYLE_VALUES)[number];
-
-interface DateTimeFormatOptions {
-  dateStyle?: DateStyle;
-  timeStyle?: TimeStyle;
-}
+type DateTimeStyle = "full" | "long" | "medium" | "short";
 
 export function getCurrentDatetime(
-  options: DateTimeFormatOptions = { dateStyle: "short", timeStyle: "medium" },
+  style: DateTimeStyle = "medium",
   locale: string = "en-US"
 ): string {
-  if (!options.dateStyle && !options.timeStyle) {
-    throw new Error("Provide at least one of dateStyle or timeStyle.");
-  }
-  if (options.dateStyle && !DATE_STYLE_VALUES.includes(options.dateStyle)) {
-    throw new Error(`Invalid dateStyle "${options.dateStyle}". Must be one of: ${DATE_STYLE_VALUES.join(", ")}`);
-  }
-  if (options.timeStyle && !TIME_STYLE_VALUES.includes(options.timeStyle)) {
-    throw new Error(`Invalid timeStyle "${options.timeStyle}". Must be one of: ${TIME_STYLE_VALUES.join(", ")}`);
-  }
-  return new Intl.DateTimeFormat(locale, options).format(new Date());
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: style,
+    timeStyle: style,
+  }).format(new Date());
 }
 
 // Prompt for tool schema:
@@ -41,19 +26,14 @@ Follow the best practices listed in the documentation here: https://platform.cla
 */
 export const getCurrentDatetimeSchema: Tool = {
   "name": "get_current_datetime",
-  "description": "Returns the current date and time formatted according to specified locale and formatting options. At least one of dateStyle or timeStyle must be provided; if neither is specified, the tool will throw an error. The tool uses the Intl.DateTimeFormat API to format dates and times according to locale-specific conventions (e.g., MM/DD/YYYY for en-US vs DD/MM/YYYY for en-GB). Use this tool whenever you need to display the current date, time, or both in a human-readable, locale-aware format. Each style option offers different verbosity levels: 'full' provides the most detail (e.g., 'Friday, May 29, 2026 at 2:30:00 PM UTC'), 'long' is detailed (e.g., 'May 29, 2026 at 2:30:00 PM'), 'medium' is standard (e.g., 'May 29, 2026, 2:30:00 PM'), and 'short' is compact (e.g., '5/29/26, 2:30 PM'). The locale parameter controls regional formatting conventions.",
+  "description": "Returns the current date and time formatted according to a specified verbosity level and locale. The tool uses the Intl.DateTimeFormat API to format dates and times according to locale-specific conventions (e.g., MM/DD/YYYY for en-US vs DD/MM/YYYY for en-GB). Use this tool whenever you need to display the current date and time in a human-readable, locale-aware format. The style option offers different verbosity levels: 'full' provides the most detail (e.g., 'Friday, May 29, 2026 at 2:30:00 PM UTC'), 'long' is detailed (e.g., 'May 29, 2026 at 2:30:00 PM'), 'medium' is standard (e.g., 'May 29, 2026, 2:30:00 PM'), and 'short' is compact (e.g., '5/29/26, 2:30 PM'). The locale parameter controls regional formatting conventions.",
   "input_schema": {
     "type": "object",
     "properties": {
-      "dateStyle": {
+      "style": {
         "type": "string",
         "enum": ["full", "long", "medium", "short"],
-        "description": "Verbosity level for the date portion. 'full' includes weekday and full date, 'long' includes full date, 'medium' is standard formatting, 'short' is compact numeric format. Omit this parameter if only time formatting is needed."
-      },
-      "timeStyle": {
-        "type": "string",
-        "enum": ["full", "long", "medium", "short"],
-        "description": "Verbosity level for the time portion. 'full' includes timezone info, 'long' and 'medium' include seconds, 'short' shows only hours and minutes. Omit this parameter if only date formatting is needed."
+        "description": "Verbosity level applied to both the date and time. 'full' includes weekday and timezone, 'long' is detailed, 'medium' is standard formatting, 'short' is a compact numeric format. Defaults to 'medium' if not provided."
       },
       "locale": {
         "type": "string",
@@ -64,23 +44,17 @@ export const getCurrentDatetimeSchema: Tool = {
   },
   "input_examples": [
     {
-      "dateStyle": "short",
-      "timeStyle": "medium"
+      "style": "short"
     },
     {
-      "dateStyle": "long",
-      "timeStyle": "long"
+      "style": "long"
     },
     {
-      "dateStyle": "medium"
-    },
-    {
-      "timeStyle": "short",
+      "style": "short",
       "locale": "de-DE"
     },
     {
-      "dateStyle": "full",
-      "timeStyle": "full",
+      "style": "full",
       "locale": "fr-FR"
     }
   ]
