@@ -15,6 +15,9 @@ console.log(answer);
 // # Add Claude's response to the conversation history
 add_assistant_message(messages, answer);
 
+// uncomment the next line to break continuity of the conversation
+// messages = []; 
+
 // Add a follow-up question
 add_user_message(messages, "Write another sentence");
 console.log(messages);
